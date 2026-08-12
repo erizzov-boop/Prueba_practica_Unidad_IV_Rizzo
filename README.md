@@ -12,8 +12,7 @@ UML (clases, actividades y máquina de estados) elaborados en *TikZ* y *visual p
 ├── main.tex                     # Documento principal en LaTeX
 ├── diagramas/
 │   ├── class_diagram.tex        # Diagrama de clases UML (P1)
-│   ├── activity_diagram.tex     # Diagrama de actividades (P2)
-│   └── DiagramaEstados.png        # Máquina de estados (P3)
+│   └── activity_diagram.tex     # Diagrama de actividades (P2)
 ├── figuras/
 │   └── DiagramaEstados.png        # Máquina de estados (P3)
 ├── ISR401_PruebaPractica_Unidad_IV.pdf                    # PDF ya compilado
