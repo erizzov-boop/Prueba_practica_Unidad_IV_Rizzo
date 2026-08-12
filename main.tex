@@ -1,0 +1,396 @@
+\documentclass[11pt,a4paper]{article}
+
+% ============ PAQUETES ============
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows.meta,positioning,automata,calc}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{amssymb}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    urlcolor=blue,
+    citecolor=black,
+    pdftitle={Prueba Practica Unidad IV - ISR-401},
+    pdfauthor={Nombre del Estudiante}
+}
+
+\setlength{\headheight}{14pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Prueba Práctica -- Unidad IV -- ISR-401}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{0.6em}{}
+
+
+\newcommand{\figuraPendiente}[3]{%
+  \begin{center}
+    \begin{tikzpicture}
+      \draw[dashed, thick, gray, fill=gray!8] (0,0) rectangle (#2,#3);
+      \node[align=center, text width=#2 cm - 1cm, gray, font=\bfseries] at (#2/2,#3/2) {#1};
+    \end{tikzpicture}
+  \end{center}%
+}
+
+\begin{document}
+
+% =====================================================================
+% CARÁTULA
+% =====================================================================
+\begin{titlepage}
+\centering
+\vspace*{1cm}
+
+{\large UNIVERSIDAD TÉCNICA ESTATAL DE QUEVEDO\par}
+{\normalsize Facultad de Ciencias de la Ingeniería \par}
+{\normalsize Carrera de Ingeniería de Software \par}
+
+\vspace{1.2cm}
+\rule{0.9\textwidth}{0.4pt}\\[0.4cm]
+{\LARGE \bfseries PRUEBA PRÁCTICA -- UNIDAD IV \par}
+\vspace{0.3cm}
+{\Large Validación, Gestión, Herramientas y Estándares de Requisitos \par}
+\rule{0.9\textwidth}{0.4pt}\\[1cm]
+
+{\normalsize Asignatura: Ingeniería de Requisitos (ISR-401) \par}
+{\normalsize Docente: Ing. Gleiston Guerrero, Mg. \par}
+\vspace{0.6cm}
+
+
+\begin{tabular}{ll}
+\textbf{Estudiante:} & Rizzo Velez Edson Nagib \\[0.4cm]
+\textbf{Fecha:} & Martes 11 de Agosto del 2026 \\[0.4cm]
+\textbf{Modalidad:} & Individual, en clase \\[0.4cm]
+\textbf{Caso:} & Sistema de Gestión de Pedidos \\[0.4cm]
+\textbf{Ponderación:} & 100 puntos (30 + 70) \\
+\end{tabular}
+
+\vspace{0.8cm}
+
+{\large \textbf{URL del repositorio:} \url{https://github.com/erizzov-boop/Prueba_practica_Unidad_IV_Rizzo}}
+
+\vspace{0.8cm}
+
+
+\vspace{0.5cm}
+
+\vfill
+{\small Documento generado en \LaTeX\ -- compilado a PDF -- versión del repositorio}
+\end{titlepage}
+
+% =====================================================================
+% CASO PRÁCTICO (contexto, referencia)
+% =====================================================================
+\section*{Caso práctico: Sistema de Gestión de Pedidos}
+Una tienda en línea requiere un módulo para gestionar los pedidos de sus clientes. Un
+\textbf{Cliente} (identificado por cédula/RUC, nombre y correo) puede realizar cero o más
+\textbf{Pedidos}. Cada \textbf{Pedido} (identificador, fecha y total) contiene una o más
+\textbf{Líneas de pedido}, y cada línea referencia un \textbf{Producto} (código, descripción,
+precio, stock). Al registrar un pedido, el sistema verifica la disponibilidad de stock: si hay
+existencias, confirma el pedido; si no, notifica el faltante. Un pedido confirmado puede
+despacharse, luego entregarse, o bien anularse mientras no haya sido entregado. El sistema debe
+registrar los pedidos con rapidez y proteger los datos personales del cliente.
+
+\bigskip
+\noindent Las diez actividades siguientes usan el mismo dominio; los modelos deben ser
+mutuamente consistentes entre sí.
+
+% =====================================================================
+% P1
+% =====================================================================
+\section{Modelo de datos -- Diagrama de clases UML}
+
+
+\subsection*{Diagrama}
+% Diagrama de clases UML - Sistema de Gestión de Pedidos
+\begin{tikzpicture}[
+    class/.style={
+        rectangle split, rectangle split parts=3, draw=black, fill=white,
+        text=black, rectangle split part align=left, font=\small,
+        text width=4.4cm, rounded corners=1pt
+    },
+    every edge/.style={draw=black, thick},
+    labelfont/.style={font=\scriptsize, text=black}
+]
+
+\node[class] (cliente) {
+    \textbf{Cliente}
+    \nodepart{second} cédulaRUC: String [id] \\ nombre: String \\ correo: String
+    \nodepart{third} +registrarPedido()
+};
+
+\node[class, right=3.8cm of cliente] (pedido) {
+    \textbf{Pedido}
+    \nodepart{second} idPedido: String [id] \\ fecha: Date \\ total: Decimal
+    \nodepart{third} +confirmar() \\ +despachar() \\ +entregar() \\ +anular()
+};
+
+\node[class, below=2.6cm of pedido] (lineapedido) {
+    \textbf{LíneaPedido}
+    \nodepart{second} cantidad: int \\ subtotal: Decimal
+    \nodepart{third} +calcularSubtotal()
+};
+
+\node[class, below=2.6cm of cliente] (producto) {
+    \textbf{Producto}
+    \nodepart{second} código: String [id] \\ descripción: String \\ precio: Decimal \\ stock: int
+    \nodepart{third} +verificarStock()
+};
+
+% Asociación Cliente - Pedido
+\draw (cliente) -- (pedido)
+    node[labelfont, pos=0.12, above] {1}
+    node[labelfont, pos=0.88, above] {0};
+
+% Composición Pedido - LineaPedido
+\draw[-{Diamond[length=8pt,width=6pt]}] (lineapedido) -- (pedido)
+    node[labelfont, pos=0.15, right] {1}
+    node[labelfont, pos=0.85, right] {1};
+
+% Asociación LineaPedido - Producto
+\draw (producto) -- (lineapedido)
+    node[labelfont, pos=0.12, above] {1}
+    node[labelfont, pos=0.88, above] {0};
+
+\end{tikzpicture}
+
+
+
+
+
+
+
+
+% =====================================================================
+% P2
+% =====================================================================
+\section{Modelo funcional -- Diagrama de actividades UML}
+
+\subsection*{Diagrama}
+% Diagrama de actividades - Registrar pedido
+\begin{tikzpicture}[
+    node distance=1.1cm and 2.2cm,
+    initial/.style={circle, draw=black, fill=black, minimum size=0.35cm},
+    final/.style={circle, draw=black, fill=white, minimum size=0.45cm, double, double distance=1.3pt},
+    action/.style={rectangle, rounded corners=5pt, draw=black, fill=white, text=black,
+        minimum width=3.2cm, minimum height=0.9cm, align=center, font=\small},
+    decision/.style={diamond, draw=black, fill=white, text=black, aspect=2,
+        inner sep=1pt, align=center, font=\scriptsize},
+    every path/.style={draw=black, thick, -{Latex[length=2.5mm]}},
+    lbl/.style={font=\scriptsize, text=black}
+]
+
+\node[initial] (start) {};
+\node[action, below=of start] (recibir) {Recibir pedido};
+\node[decision, below=1.3cm of recibir] (stock) {¿Stock\\disponible?};
+\node[action, below left=1.4cm and 0.3cm of stock] (confirmar) {Confirmar pedido};
+\node[action, below right=1.4cm and 0.3cm of stock] (notificar) {Notificar faltante};
+\node[final, below=2.6cm of stock] (end) {};
+
+\draw (start) -- (recibir);
+\draw (recibir) -- (stock);
+\draw (stock) -| (confirmar) node[lbl, pos=0.25, above] {Sí};
+\draw (stock) -| (notificar) node[lbl, pos=0.25, above] {No};
+\draw (confirmar) |- (end);
+\draw (notificar) |- (end);
+
+\end{tikzpicture}
+
+
+
+
+
+
+
+
+
+% =====================================================================
+% P3
+% =====================================================================
+\section{Modelo de comportamiento -- Máquina de estados UML}
+\subsection*{Diagrama}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.85\linewidth]{DiagramaEstados.png}
+    \caption{Diagrama de estados}
+    \label{fig:placeholder}
+\end{figure}
+
+% =====================================================================
+% P4
+% =====================================================================
+\section{Consistencia entre las tres perspectivas}
+
+\subsection*{Tabla de verificación cruzada}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lll}
+\toprule
+\textbf{Evento (P3)} & \textbf{Función/acción (P2)} & \textbf{Entidad/atributo (P1)} \\
+\midrule
+confirmar  & Confirmar pedido & Pedido.estado \\
+despachar  & Despachar pedido & Pedido.estado \\
+entregar   & Entregar pedido  & Pedido.estado \\
+anular     & Anular pedido    & Pedido.estado \\
+\bottomrule
+\end{tabular}
+\caption{Verificación cruzada entre eventos, funciones y entidades}
+\end{table}
+
+\subsection*{Inconsistencia detectada}
+El evento \textbf{``notificar faltante''} (P2) no tiene una transición correspondiente en la
+máquina de estados de P3, ya que el pedido permanece en el estado \emph{Registrado}.
+
+\subsection*{Corrección aplicada}
+Se documenta como nota en la máquina de estados que el camino no produce cambio de estado.
+
+% =====================================================================
+% P5
+% =====================================================================
+\section{Especificación de requisitos con esquema de atributos}
+
+\begin{description}[leftmargin=1.5cm]
+  \item[RF-01:] El sistema debe permitir registrar un pedido con sus líneas y calcular el total
+        automáticamente.
+  \item[RF-02:] El sistema debe verificar el stock del producto antes de confirmar el pedido.
+  \item[RNF-01:] \textit{(Eficiencia de desempeño, ISO/IEC 25010)}: el sistema debe registrar un
+        pedido en menos de 3 segundos bajo carga normal.
+  \item[RNF-02:] \textit{(Seguridad, ISO/IEC 25010)}: los datos personales del cliente deben
+        cifrarse en reposo y en tránsito.
+\end{description}
+
+\subsection*{Esquema de atributos}
+\begin{table}[h!]
+\centering
+\begin{tabular}{lllllll}
+\toprule
+\textbf{ID} & \textbf{Prioridad} & \textbf{Estado} & \textbf{Fuente} & \textbf{Estabilidad} & \textbf{Versión} & \textbf{Verificación} \\
+\midrule
+RF-01  & Alta  & Propuesto & Caso de negocio & Alta  & 1.0 & Prueba \\
+RF-02  & Alta  & Propuesto & Caso de negocio & Alta  & 1.0 & Prueba \\
+RNF-01 & Media & Propuesto & Caso de negocio & Media & 1.0 & Prueba de carga \\
+RNF-02 & Media & Propuesto & Caso de negocio & Media & 1.0 & Inspección/prueba \\
+\bottomrule
+\end{tabular}
+\caption{Esquema de atributos de los requisitos}
+\end{table}
+
+% =====================================================================
+% P6
+% =====================================================================
+\section{Priorización MoSCoW}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{RF-01 -- Must have}: Es el núcleo funcional del sistema.
+  \item \textbf{RF-02 -- Must have}: Garantiza la integridad de los datos e inventario.
+  \item \textbf{RNF-01 -- Should have}: Mejora la experiencia pero no bloquea la operación básica.
+  \item \textbf{RNF-02 -- Could have}: Deseable desde el inicio puede incorporarse en una iteración posterior.
+\end{itemize}
+
+% =====================================================================
+% P7
+% =====================================================================
+\section{Validación por inspección (checklist ISO/IEC/IEEE 29148)}
+
+\subsection*{Propiedades evaluadas}
+No ambiguo, completo, singular, verificable, factible.
+
+\subsection*{Defectos detectados (sin corregir)}
+RNF-02 no especifica algoritmo ni umbral medible
+$\Rightarrow$ incumple la propiedad de \emph{``verificable''}.
+
+\subsection*{Retrabajo (segundo paso)}
+``Los datos personales deben cifrarse con AES-256 en reposo y TLS 1.3 en tránsito.''
+
+% =====================================================================
+% P8
+% =====================================================================
+\section{Pruebas de aceptación trazadas}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lllll}
+\toprule
+\textbf{ID} & \textbf{Tipo} & \textbf{Entradas} & \textbf{Criterio de éxito} & \textbf{Requisito que traza} \\
+\midrule
+PA-01 & Funcional     & Pedido con 2 líneas válidas    & Total calculado correctamente          & RF-01 \\
+PA-02 & Funcional     & Producto sin stock             & Notifica faltante, no confirma pedido  & RF-02 \\
+PA-03 & No funcional  & 100 pedidos simultáneos        & Cada registro $<$ 3 sg                  & RNF-01 \\
+PA-04 & No funcional  & Intento de acceso directo a BD & Datos ilegibles sin clave              & RNF-02 \\
+\bottomrule
+\end{tabular}
+\caption{Pruebas de aceptación trazadas a los requisitos}
+\end{table}
+
+% =====================================================================
+% P9
+% =====================================================================
+\section{Matriz de trazabilidad}
+
+\begin{table}[h!]
+\centering
+\small
+\begin{tabular}{lp{2.3cm}p{5.2cm}l}
+\toprule
+\textbf{Requisito} & \textbf{Fuente} & \textbf{Modelo asociado} & \textbf{Prueba de aceptacion} \\
+\midrule
+RF-01  & Caso de negocio & P1: Pedido/LíneaPedido; P2: flujo completo & PA-01 \\
+RF-02  & Caso de negocio & P1: Producto.stock; P2: decisión stock     & PA-02 \\
+RNF-01 & Caso de negocio & P2: flujo ``Registrar pedido''             & PA-03 \\
+RNF-02 & Caso de negocio & P1: Cliente (datos personales)             & PA-04 \\
+\bottomrule
+\end{tabular}
+\caption{Matriz de trazabilidad de requisitos}
+\end{table}
+
+\subsection*{Dependencia horizontal}
+RF-02 depende de RF-01, ya que no puede verificarse el stock sin que exista previamente un
+pedido creado.
+
+\subsection*{Requisitos huérfanos}
+Ninguno.
+
+% =====================================================================
+% P10
+% =====================================================================
+\section{Gestión del cambio y línea base}
+
+\subsection*{Solicitud de cambio}
+``Agregar notificación por correo al cliente al confirmar el pedido''.
+
+\subsection*{Análisis de impacto (según matriz de P9)}
+Afecta a RF-01, al diagrama de clases (nuevo método en la clase Pedido) y a la prueba PA-01.
+
+\subsection*{Decisión del CCB}
+\textbf{Aprobada}, con prioridad \emph{Should have}.
+
+\subsection*{Nueva versión}
+RF-01 pasa de la versión 1.0 a la versión 1.1.
+
+\subsection*{Línea base declarada (Baseline 1.0)}
+Se congela la siguiente configuración coherente:
+\begin{itemize}[leftmargin=1.2cm]
+  \item ERS V1.0
+  \item Modelos de clases, actividades y estados V1.0
+  \item Matriz de trazabilidad V1.0
+  \item Pruebas de aceptación V1.0
+\end{itemize}
+
+
+\end{document}
