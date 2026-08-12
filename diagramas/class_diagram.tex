@@ -1,0 +1,51 @@
+% Diagrama de clases UML - Sistema de Gestión de Pedidos
+\begin{tikzpicture}[
+    class/.style={
+        rectangle split, rectangle split parts=3, draw=black, fill=white,
+        text=black, rectangle split part align=left, font=\small,
+        text width=4.4cm, rounded corners=1pt
+    },
+    every edge/.style={draw=black, thick},
+    labelfont/.style={font=\scriptsize, text=black}
+]
+
+\node[class] (cliente) {
+    \textbf{Cliente}
+    \nodepart{second} cédulaRUC: String [id] \\ nombre: String \\ correo: String
+    \nodepart{third} +registrarPedido()
+};
+
+\node[class, right=3.8cm of cliente] (pedido) {
+    \textbf{Pedido}
+    \nodepart{second} idPedido: String [id] \\ fecha: Date \\ total: Decimal
+    \nodepart{third} +confirmar() \\ +despachar() \\ +entregar() \\ +anular()
+};
+
+\node[class, below=2.6cm of pedido] (lineapedido) {
+    \textbf{LíneaPedido}
+    \nodepart{second} cantidad: int \\ subtotal: Decimal
+    \nodepart{third} +calcularSubtotal()
+};
+
+\node[class, below=2.6cm of cliente] (producto) {
+    \textbf{Producto}
+    \nodepart{second} código: String [id] \\ descripción: String \\ precio: Decimal \\ stock: int
+    \nodepart{third} +verificarStock()
+};
+
+% Asociación Cliente - Pedido
+\draw (cliente) -- (pedido)
+    node[labelfont, pos=0.12, above] {1}
+    node[labelfont, pos=0.88, above] {0..*};
+
+% Composición Pedido - LineaPedido
+\draw[-{Diamond[length=8pt,width=6pt]}] (lineapedido) -- (pedido)
+    node[labelfont, pos=0.15, right] {1..*}
+    node[labelfont, pos=0.85, right] {1};
+
+% Asociación LineaPedido - Producto
+\draw (producto) -- (lineapedido)
+    node[labelfont, pos=0.12, above] {1}
+    node[labelfont, pos=0.88, above] {0..*};
+
+\end{tikzpicture}
