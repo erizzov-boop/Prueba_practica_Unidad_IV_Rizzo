@@ -36,16 +36,16 @@
 % Asociación Cliente - Pedido
 \draw (cliente) -- (pedido)
     node[labelfont, pos=0.12, above] {1}
-    node[labelfont, pos=0.88, above] {0..*};
+    node[labelfont, pos=0.88, above] {0};
 
 % Composición Pedido - LineaPedido
 \draw[-{Diamond[length=8pt,width=6pt]}] (lineapedido) -- (pedido)
-    node[labelfont, pos=0.15, right] {1..*}
+    node[labelfont, pos=0.15, right] {1}
     node[labelfont, pos=0.85, right] {1};
 
 % Asociación LineaPedido - Producto
 \draw (producto) -- (lineapedido)
     node[labelfont, pos=0.12, above] {1}
-    node[labelfont, pos=0.88, above] {0..*};
+    node[labelfont, pos=0.88, above] {0};
 
 \end{tikzpicture}
